@@ -8,9 +8,6 @@ import re
 from nltk.tokenize import sent_tokenize
 
 class QuestionGeneration:
-    '''This class contains the method
-    to generate questions
-    '''
 
     def __init__(self, num_questions, num_options):
         self.num_questions = num_questions

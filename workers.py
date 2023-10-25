@@ -26,6 +26,7 @@ def pdf2text(file_path: str, file_exten: str) -> str:
     return _content
 
 
+
 def txt2questions(doc: str, n=10, o=4) -> dict:
     """ Get all questions and options """
 
@@ -63,6 +64,7 @@ def extractive_summarize(text, num_sentences=2):
     ranked_sentences = sorted(((sentence_scores[i], sentence) for i, sentence in enumerate(sentences)), reverse=True)
     summary = " ".join([ranked_sentence[1] for ranked_sentence in ranked_sentences[:num_sentences]])
     return summary
+
 
 def summarize_pdf(file_path, file_exten, num_sentences=2):
     # Convert the PDF to text

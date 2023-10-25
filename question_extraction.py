@@ -8,10 +8,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class QuestionExtractor:
-    ''' This class contains all the methods
-    required for extracting questions from
-    a given document
-    '''
 
     def __init__(self, num_questions):
 
@@ -28,18 +24,7 @@ class QuestionExtractor:
         self.questions_dict = dict()
 
     def get_questions_dict(self, document):
-        '''
-        Returns a dict of questions in the format:
-        question_number: {
-            question: str
-            answer: str
-        }
 
-        Params:
-            * document : string
-        Returns:
-            * dict
-        '''
         # find candidate keywords
         self.candidate_keywords = self.get_candidate_entities(document)
 
@@ -55,37 +40,18 @@ class QuestionExtractor:
         return self.questions_dict
 
     def get_filtered_sentences(self, document):
-        ''' Returns a list of sentences - each of
-        which has been cleaned of stopwords.
-        Params:
-                * document: a paragraph of sentences
-        Returns:
-                * list<str> : list of string
-        '''
+
         sentences = sent_tokenize(document)  # split documents into sentences
 
         return [self.filter_sentence(sentence) for sentence in sentences]
 
     def filter_sentence(self, sentence):
-        '''Returns the sentence without stopwords
-        Params:
-                * sentence: A string
-        Returns:
-                * string
-        '''
+
         words = word_tokenize(sentence)
         return ' '.join(w for w in words if w not in self.stop_words)
 
     def get_candidate_entities(self, document):
-        ''' Returns a list of entities according to
-        spacy's ner tagger. These entities are candidates
-        for the questions
 
-        Params:
-                * document : string
-        Returns:
-                * list<str>
-        '''
         entities = self.ner_tagger(document)
         entity_list = []
 
@@ -128,12 +94,7 @@ class QuestionExtractor:
             self.word_score[word] = tot / num_sentences
 
     def get_keyword_score(self, keyword):
-        ''' Returns the score for a keyword
-        Params:
-            * keyword : string of possible several words
-        Returns:
-            * float : score
-        '''
+
         score = 0.0
         for word in word_tokenize(keyword):
             if word in self.word_score:
@@ -141,9 +102,7 @@ class QuestionExtractor:
         return score
 
     def get_corresponding_sentence_for_keyword(self, keyword):
-        ''' Finds and returns a sentence containing
-        the keywords
-        '''
+
         words = word_tokenize(keyword)
         for word in words:
 
@@ -175,9 +134,7 @@ class QuestionExtractor:
         self.candidate_triples.sort(reverse=True)
 
     def form_questions(self):
-        ''' Forms the question and populates
-        the question dict
-        '''
+
         used_sentences = list()
         idx = 0
         cntr = 1

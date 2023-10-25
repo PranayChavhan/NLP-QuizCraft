@@ -11,10 +11,7 @@ import numpy as np
 
 
 class IncorrectAnswerGenerator:
-    ''' This class contains the methods
-    for generating the incorrect answers
-    given an answer
-    '''
+
 
     def __init__(self, document):
         # model required to fetch similar words
@@ -25,10 +22,6 @@ class IncorrectAnswerGenerator:
         self.all_words = list(set(self.all_words))
 
     def get_all_options_dict(self, answer, num_options):
-        ''' This method returns a dict
-        of 'num_options' options out of
-        which one is correct and is the answer
-        '''
         options_dict = dict()
         try:
             similar_words = self.model.similar_by_word(answer, topn=15)[::-1]
