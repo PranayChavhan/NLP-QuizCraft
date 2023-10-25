@@ -1,7 +1,4 @@
-'''This module ties together the
-questions generation and incorrect answer
-generation modules
-'''
+
 from question_extraction import QuestionExtractor
 from incorrect_answer_generation import IncorrectAnswerGenerator
 import re
