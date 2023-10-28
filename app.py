@@ -48,9 +48,9 @@ def quiz():
             
             summary = summarize_pdf(file_path, file_exten)
             
-            print("+++++++++++++++++++++")
-            print(summary)
-            print("+++++++++++++++++++++")
+            # print("+++++++++++++++++++++")
+            # print(summary)
+            # print("+++++++++++++++++++++")
             # File upload + convert success
             if uploaded_content is not None:
                 UPLOAD_STATUS = True

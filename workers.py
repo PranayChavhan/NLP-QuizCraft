@@ -3,6 +3,14 @@ from question_generation_main import QuestionGeneration
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import re
+import spacy
+# from gensim.summarization import summarize
+
+
+# Load the spaCy model for English
+nlp = spacy.load("en_core_web_sm")
+
 
 def pdf2text(file_path: str, file_exten: str) -> str:
     """ Converts a given file to text content """
@@ -42,9 +50,22 @@ def txt2questions(doc: str, n=10, o=4) -> dict:
 
 
 
-def extractive_summarize(text, num_sentences=2):
-    # Tokenize the text into sentences
-    sentences = text.split('.')
+def extractive_summarize(text, num_sentences):
+    # Tokenize the text into sentences using a regular expression
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+    
+    # If there are too few sentences, return the entire text
+    if len(sentences) <= num_sentences:
+        return text
+
+    # Process the text with spaCy to recognize names and entities
+    doc = nlp(text)
+    
+    # Collect recognized names and entities
+    named_entities = set()
+    for ent in doc.ents:
+        if ent.label_ in ["PERSON", "ORG", "GPE"]:  # Customize the entity types as needed
+            named_entities.add(ent.text)
 
     # Vectorize the sentences
     vectorizer = CountVectorizer().fit_transform(sentences)
@@ -52,21 +73,31 @@ def extractive_summarize(text, num_sentences=2):
 
     # Calculate sentence similarity using cosine similarity
     similarity_matrix = cosine_similarity(vectors)
-    
-    # Rank sentences based on similarity
+
+    # Rank sentences based on similarity and named entity presence
     sentence_scores = np.zeros(len(sentences))
     for i in range(len(sentences)):
         for j in range(len(sentences)):
             if i != j:
                 sentence_scores[i] += similarity_matrix[i][j]
+                for entity in named_entities:
+                    if entity in sentences[i]:
+                        sentence_scores[i] += 1  # Add weight for sentences containing named entities
 
-    # Get the top-ranked sentences for the summary
-    ranked_sentences = sorted(((sentence_scores[i], sentence) for i, sentence in enumerate(sentences)), reverse=True)
-    summary = " ".join([ranked_sentence[1] for ranked_sentence in ranked_sentences[:num_sentences]])
+    # Get the top-ranked sentences for the summary, preserving their original order
+    ranked_sentences = [(sentence_scores[i], sentence, i) for i, sentence in enumerate(sentences)]
+    ranked_sentences = sorted(ranked_sentences, key=lambda x: x[0], reverse=True)[:num_sentences]
+    ranked_sentences = sorted(ranked_sentences, key=lambda x: x[2])
+
+    # Construct the summary in the original sequence
+    summary = " ".join([ranked_sentence[1] for ranked_sentence in ranked_sentences])
+
     return summary
 
 
-def summarize_pdf(file_path, file_exten, num_sentences=2):
+
+
+def summarize_pdf(file_path, file_exten, num_sentences=10):
     # Convert the PDF to text
     pdf_text = pdf2text(file_path, file_exten)
     
